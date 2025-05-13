@@ -1,6 +1,5 @@
 import { Telegraf } from "telegraf";
-import Order from "../models/orders.js";
-
+import Order from "../models/Orders.js";
 // Инициализация бота Telegram
 const bot = new Telegraf("7095638242:AAGY5RGu26_GFqM60YEVKt6WPwrSXiM6NQ0");
 const TELEGRAM_CHAT_ID = -4730504232;
