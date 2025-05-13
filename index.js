@@ -12,6 +12,7 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     "http://localhost:3000",
     "http://engraveart.space",
+    "http://engraveart.space:3000",
     "https://engraveart.space",
     "http://api.engraveart.space",
     "https://api.engraveart.space",
