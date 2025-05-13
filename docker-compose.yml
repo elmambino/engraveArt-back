@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: node-api
+    restart: always
+    ports:
+      - "8182:8182"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/engraveDB
+
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

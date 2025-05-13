@@ -1,0 +1,9 @@
+# node_modules
+node_modules
+# dockerfiles
+Dockerfile
+.dockerignore
+# logs
+*.log
+# markdown
+*.md

@@ -26,6 +26,10 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use("/api", router);
 
+app.get("/", (req, res) => {
+  res.send("API сервер работает");
+});
+
 async function startApp() {
   try {
     await mongoose.connect(DB_URL);
