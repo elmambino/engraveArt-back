@@ -1,10 +1,10 @@
 import express from "express";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 import router from "./router.js";
-import cors from "cors";
+// import cors from "cors";
 
 const PORT = 8182;
-const DB_URL = "mongodb://localhost:27017/engraveDB";
+// const DB_URL = "mongodb://localhost:27017/engraveDB";
 
 const app = express();
 
@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 
 async function startApp() {
   try {
-    await mongoose.connect(DB_URL);
+    // await mongoose.connect(DB_URL);
     app.listen(PORT, () => {
       console.log("Сервер завелся на порту", PORT);
     });
