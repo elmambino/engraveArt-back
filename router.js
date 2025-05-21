@@ -13,5 +13,6 @@ router.put("/orders/:id/status", OrderController.updateOrderStatus);
 // Маршруты для отзывов
 router.post("/reviews", ReviewController.createReview);
 router.get("/reviews", ReviewController.getAllReviews);
+router.delete("/reviews/:id", ReviewController.deleteReview);
 
 export default router;
