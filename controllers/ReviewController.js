@@ -64,6 +64,47 @@ class ReviewController {
       });
     }
   }
+
+  // Удаление отзыва
+  async deleteReview(req, res) {
+    try {
+      const { id } = req.params;
+      
+      // Проверяем, существует ли отзыв с таким ID
+      const review = await Review.findById(id);
+      if (!review) {
+        return res.status(404).json({
+          success: false,
+          message: "Отзыв не найден",
+        });
+      }
+      
+      // Удаляем отзыв
+      await Review.findByIdAndDelete(id);
+      
+      // Отправляем уведомление в Telegram
+      const message = `
+🗑️ Отзыв удален!
+👤 Имя: ${review.name}
+⭐ Оценка: ${"⭐".repeat(review.stars)} (${review.stars}/5)
+💬 Текст: ${review.text}
+      `;
+      
+      await bot.telegram.sendMessage(TELEGRAM_CHAT_ID, message);
+      
+      return res.status(200).json({
+        success: true,
+        message: "Отзыв успешно удален",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Ошибка при удалении отзыва",
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new ReviewController();
