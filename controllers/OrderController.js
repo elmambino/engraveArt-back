@@ -1,8 +1,60 @@
 import { Telegraf } from "telegraf";
 import Order from "../models/Orders.js";
+
 // Инициализация бота Telegram
 const bot = new Telegraf("7095638242:AAGY5RGu26_GFqM60YEVKt6WPwrSXiM6NQ0");
 const TELEGRAM_CHAT_ID = -4730504232;
+
+// Вынесем функции валидации за пределы класса
+const validatePhoneNumber = (phoneNumber) => {
+  // Удаляем все пробелы, дефисы, скобки и плюсы
+  const cleanPhone = phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+  
+  // Проверяем, что остались только цифры
+  if (!/^\d+$/.test(cleanPhone)) {
+    return { isValid: false, message: "Номер телефона должен содержать только цифры" };
+  }
+  
+  // Проверяем длину номера (от 10 до 15 цифр - международный стандарт)
+  if (cleanPhone.length < 10 || cleanPhone.length > 15) {
+    return { isValid: false, message: "Номер телефона должен содержать от 10 до 15 цифр" };
+  }
+  
+  // Дополнительные проверки для российских номеров
+  if (cleanPhone.length === 11 && cleanPhone.startsWith('8')) {
+    // Российский номер, начинающийся с 8
+    if (!/^8[3-9]\d{9}$/.test(cleanPhone)) {
+      return { isValid: false, message: "Неверный формат российского номера телефона" };
+    }
+  } else if (cleanPhone.length === 11 && cleanPhone.startsWith('7')) {
+    // Российский номер, начинающийся с 7
+    if (!/^7[3-9]\d{9}$/.test(cleanPhone)) {
+      return { isValid: false, message: "Неверный формат российского номера телефона" };
+    }
+  } else if (cleanPhone.length === 10) {
+    // Российский номер без кода страны
+    if (!/^[3-9]\d{9}$/.test(cleanPhone)) {
+      return { isValid: false, message: "Неверный формат номера телефона" };
+    }
+  }
+  
+  return { isValid: true, cleanPhone };
+};
+
+const validateCustomerName = (name) => {
+  // Проверяем, что имя содержит только буквы, пробелы и дефисы
+  const nameRegex = /^[а-яёА-ЯЁa-zA-Z\s\-]+$/;
+  
+  if (!nameRegex.test(name.trim())) {
+    return { isValid: false, message: "ФИО должно содержать только буквы" };
+  }
+  
+  if (name.trim().length < 2) {
+    return { isValid: false, message: "ФИО должно содержать минимум 2 символа" };
+  }
+  
+  return { isValid: true, cleanName: name.trim() };
+};
 
 class OrderController {
   async createOrder(req, res) {
@@ -15,11 +67,37 @@ class OrderController {
         });
       }
 
-      // Сохраняем заказ в базу данных
+      // Валидация ФИО
+      const nameValidation = validateCustomerName(customerName);
+      if (!nameValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: nameValidation.message,
+        });
+      }
+
+      // Валидация номера телефона
+      const phoneValidation = validatePhoneNumber(phoneNumber);
+      if (!phoneValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: phoneValidation.message,
+        });
+      }
+
+      // Валидация текста заказа
+      if (text.trim().length < 5) {
+        return res.status(400).json({
+          success: false,
+          message: "Текст заказа должен содержать минимум 5 символов",
+        });
+      }
+
+      // Сохраняем заказ в базу данных с очищенными данными
       const order = new Order({
-        text,
-        customerName,
-        phoneNumber,
+        text: text.trim(),
+        customerName: nameValidation.cleanName,
+        phoneNumber: phoneValidation.cleanPhone,
       });
 
       const savedOrder = await order.save();
@@ -27,9 +105,9 @@ class OrderController {
       // Формируем сообщение для отправки в Telegram
       const message = `
 📋 Новый заказ #${savedOrder._id}!
-👤 ФИО: ${customerName}
-📞 Телефон: ${phoneNumber}
-📝 Текст заказа: ${text}
+👤 ФИО: ${nameValidation.cleanName}
+📞 Телефон: ${phoneValidation.cleanPhone}
+📝 Текст заказа: ${text.trim()}
       `;
 
       // Отправляем сообщение в Telegram
