@@ -2,7 +2,7 @@ import { Telegraf } from "telegraf";
 import Order from "../models/Orders.js";
 
 // Инициализация бота Telegram
-const bot = new Telegraf("7095638242:AAGY5RGu26_GFqM60YEVKt6WPwrSXiM6NQ0");
+const bot = new Telegraf("7916561506:AAFIZ9WeSGBYOfv1LRQ4MZuDSSvERhNfyag");
 const TELEGRAM_CHAT_ID = -4730504232;
 
 // Вынесем функции валидации за пределы класса
