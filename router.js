@@ -12,7 +12,9 @@ router.put("/orders/:id/status", OrderController.updateOrderStatus);
 
 // Маршруты для отзывов
 router.post("/reviews", ReviewController.createReview);
-router.get("/reviews", ReviewController.getAllReviews);
+router.get("/reviews", ReviewController.getAllReviews); // Только одобренные отзывы
+router.get("/admin/reviews", ReviewController.getAllReviewsAdmin); // Все отзывы для админки
+router.put("/reviews/:id/status", ReviewController.updateReviewStatus); // Изменение статуса
 router.delete("/reviews/:id", ReviewController.deleteReview);
 
 export default router;
